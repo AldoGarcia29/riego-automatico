@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GreenDrop – Riego Automático</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="hdr">
+    <div class="container topbar">
+      <div class="brand">
+        <div class="logo">
+  <img src="assets/logosr.jpg" alt="GreenDrop" class="logo-img">
+</div>
+
+        <div>
+          <div class="brand-title">GreenDrop</div>
+          <div class="muted" id="connected-label" style="font-size:12px"></div>
+        </div>
+      </div>
+
+        <button class="menu-icon" id="menuBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mainNav">
+    &#9776;
+  </button>
+      <nav class="nav" id="mainNav">
+        <button class="navbtn" data-route="splash">Inicio</button>
+        <button class="navbtn" data-route="auth">Acceso</button>
+        <button class="navbtn" data-route="scan">Buscar</button>
+        <button class="navbtn" data-route="device">Dispositivo</button>
+        <button class="navbtn" data-route="irrigate">Riego</button>
+        <button class="navbtn" data-route="history">Historial</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" id="app-root" style="padding-bottom:80px">
+    <!-- Aquí se inyecta cada vista -->
+  </main>
+
+  <!-- Servicios (API) -->
+  <script src="./js/services/api.js"></script>
+
+  <!-- Vistas -->
+  <script src="./js/views/splash.view.js"></script>
+  <script src="./js/views/auth.view.js"></script>
+  <script src="./js/views/scan.view.js"></script>
+  <script src="./js/views/device.view.js"></script>
+  <script src="./js/views/irrigate.view.js"></script>
+  <script src="./js/views/history.view.js"></script>
+
+  <!-- App (router/estado) -->
+  <script src="./js/app.js"></script>
+
+  <script>
+  // JS básico
+const btn = document.getElementById('menuBtn');
+const nav = document.getElementById('mainNav');
+
+btn.addEventListener('click', () => {
+  const open = nav.classList.toggle('show');
+  btn.classList.toggle('active', open);
+  btn.setAttribute('aria-expanded', open);
+});
+
+// opcional: cerrar al hacer click fuera
+document.addEventListener('click', (e) => {
+  if (!nav.contains(e.target) && !btn.contains(e.target)) {
+    nav.classList.remove('show');
+    btn.classList.remove('active');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+});
+
+</script>
+
+</body>
+</html>
