@@ -106,23 +106,37 @@ window.DeviceView = {
       safeSet("stat-estado",  state.sensores.estado  || "—");
     }
 
-    // --- 3. Simulación de pullSensors mientras no hay backend ---
-    async function pullSensors(){
-      if(!state.connected) return;
+    // --- 3. Lectura real del backend con fallback de simulación ---
+async function pullSensors() {
+  if (!state.connected) return;
 
-      // si tuviéramos backend real:
-      // try {
-      //   const stats = await API.getLatestStats(state.connected.id);
-      //   state.sensores = stats;
-      // } catch(e) {}
+  try {
+    // 🔗 Llamada al backend NestJS (módulo readings)
+    const resp = await fetch(
+      `http://localhost:3000/readings/latest?deviceId=${encodeURIComponent(state.connected.id)}`
+    );
+    const data = await resp.json();
 
-      // por ahora: simular cambios suaves (para que veas movimiento en UI)
-      state.sensores.humedad = clamp(randAround(state.sensores.humedad, 1), 30, 80);
-      state.sensores.pureza  = clamp(randAround(state.sensores.pureza, 1), 80, 100);
-      state.sensores.estado  = "OK";
-
+    // ✅ Si hay datos válidos, los mostramos
+    if (data && typeof data.humedad === "number" && typeof data.pureza === "number") {
+      state.sensores.humedad = data.humedad;
+      state.sensores.pureza = data.pureza;
+      state.sensores.estado = data.estado || "OK";
       renderStats();
+      return;
     }
+  } catch (e) {
+    console.warn("No se pudo obtener lectura del backend, usando valores simulados...");
+  }
+
+  // 🔄 Fallback: simulación si no hay datos o backend no responde
+  state.sensores.humedad = clamp(randAround(state.sensores.humedad, 1), 30, 80);
+  state.sensores.pureza = clamp(randAround(state.sensores.pureza, 1), 80, 100);
+  state.sensores.estado = "OK";
+
+  renderStats();
+}
+
 
     // utilidades para fake fluctuar valores
     function randAround(base, delta){
